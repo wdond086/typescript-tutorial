@@ -74,3 +74,34 @@ type ReplaceCWithD<T> = T extends "c" ? "d" : T;
 
 type WoWwithD = ReplaceCWithD<Letters>;
 ```
+
+## 3.) How to have loose autocompletion
+
+- Sometimes you want to have the possibility of setting types which extend each other without completely loosing the autocomplete.
+- In the example, we want an Icon which takes a size of type IconSize. We want the auto complete for the default sizes available, but we also want to have the ability to put any string.
+- Unfortunately, we cannot just add the string type to the IconSize union type because we will loose the autocomplete of `xs` and `sm`.
+- We loose the autocomplete because all the types in the union are strings, so the check will only be for the string type.
+- To allow for any string while still having the autocomplete, we use `Omit` as shown. It basically means, any type T which extends string, return the type T, or the type string, so long as that string is not T.
+
+```ts
+type LooseAutoComplete<T extends string> = T | Omit<string, T>;
+
+type IconSize = LooseAutoComplete<"sm" | "xs">;
+
+interface IconProps {
+    size: IconSize;
+}
+
+export const Icon = (props: IconProps) => {
+    return <></>;
+};
+
+const Comp1 = () => {
+    return (
+        <>
+            <Icon size="xs"></Icon>
+            <Icon size="something"></Icon>
+        </>
+    );
+};
+```
